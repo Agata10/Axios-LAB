@@ -22,7 +22,33 @@ const API_KEY =
  *  - Each option should display text equal to the name of the breed.
  * This function should execute immediately.
  */
+(async function initalLoad() {
+  try {
+    const response = await fetch(
+      `https://api.thecatapi.com/v1/breeds?api_key=${API_KEY}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      },
+    );
+    if (!response.ok) {
+      throw new Error("Not fetched data.");
+    }
 
+    const breeds = await response.json();
+    breeds.forEach((breed) => {
+      console.log(breeds);
+      const option = document.createElement("option");
+      option.text = breed.name;
+      option.value = breed.id;
+      breedSelect.appendChild(option);
+    });
+  } catch (err) {
+    console.error(err);
+  }
+})();
 /**
  * 2. Create an event handler for breedSelect that does the following:
  * - Retrieve information on the selected breed from the cat API using fetch().
