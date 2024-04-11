@@ -11,7 +11,8 @@ const progressBar = document.getElementById("progressBar");
 const getFavouritesBtn = document.getElementById("getFavouritesBtn");
 
 // Step 0: Store your API key here for reference and easy access.
-const API_KEY = "";
+const API_KEY =
+  "live_VK9v9Y7A19F4Eqlo3fNyWAQ8iaY1dhKu3Lvg4ImOoygZPAp5oit1zOe7r4POvWc3";
 
 /**
  * 1. Create an async function "initialLoad" that does the following:
@@ -21,7 +22,33 @@ const API_KEY = "";
  *  - Each option should display text equal to the name of the breed.
  * This function should execute immediately.
  */
+(async function initalLoad() {
+  try {
+    const response = await fetch(
+      `https://api.thecatapi.com/v1/breeds?api_key=${API_KEY}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      },
+    );
+    if (!response.ok) {
+      throw new Error("Not fetched data.");
+    }
 
+    const breeds = await response.json();
+    breeds.forEach((breed) => {
+      console.log(breeds);
+      const option = document.createElement("option");
+      option.text = breed.name;
+      option.value = breed.id;
+      breedSelect.appendChild(option);
+    });
+  } catch (err) {
+    console.error(err);
+  }
+})();
 /**
  * 2. Create an event handler for breedSelect that does the following:
  * - Retrieve information on the selected breed from the cat API using fetch().
