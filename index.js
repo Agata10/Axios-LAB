@@ -63,6 +63,36 @@ const API_KEY =
  * - Each new selection should clear, re-populate, and restart the Carousel.
  * - Add a call to this function to the end of your initialLoad function above to create the initial carousel.
  */
+async function retrieveData(e) {
+  let count = 0;
+  try {
+    const response = await fetch(
+      `https://api.thecatapi.com/v1/images/search?limit=10&breed_ids=${e.target.value}&api_key=${API_KEY}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      },
+    );
+    console.log(count++);
+    const elements = await response.json();
+
+    elements.forEach((elem) => {
+      const child = Carousel.createCarouselItem(
+        elem.url,
+        elem.breeds.name,
+        elem.id,
+      );
+      Carousel.appendCarousel(child);
+      // console.log(elem.breeds[0].dog_friendly);
+      // console.log(elem.breeds[0].affection_level);
+    });
+  } catch (err) {
+    console.error(err);
+  }
+}
+breedSelect.addEventListener("change", retrieveData);
 
 /**
  * 3. Fork your own sandbox, creating a new one named "JavaScript Axios Lab."
