@@ -23,35 +23,35 @@ const API_KEY =
  *  - Each option should display text equal to the name of the breed.
  * This function should execute immediately.
  */
-(async function initalLoad() {
-  const response = await fetch(
-    `https://api.thecatapi.com/v1/breeds?api_key=${API_KEY}`,
-    {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    },
-  );
-  handleResponse(response);
-  retrieveData();
-})();
+// (async function initalLoad() {
+//   const response = await fetch(
+//     `https://api.thecatapi.com/v1/breeds?api_key=${API_KEY}`,
+//     {
+//       method: "GET",
+//       headers: {
+//         "Content-Type": "application/json",
+//       },
+//     },
+//   );
+//   handleResponse(response);
+//   retrieveData();
+// })();
 
-const handleResponse = async (response) => {
-  if (response.ok) {
-    const breeds = await response.json();
+// const handleResponse = async (response) => {
+//   if (response.ok) {
+//     const breeds = await response.json();
 
-    breeds.forEach((breed) => {
-      const option = document.createElement("option");
-      option.text = breed.name;
-      option.value = breed.id;
-      breedSelect.appendChild(option);
-    });
-  } else {
-    console.log(response.status);
-    return response.status;
-  }
-};
+//     breeds.forEach((breed) => {
+//       const option = document.createElement("option");
+//       option.text = breed.name;
+//       option.value = breed.id;
+//       breedSelect.appendChild(option);
+//     });
+//   } else {
+//     console.log(response.status);
+//     return response.status;
+//   }
+// };
 
 /**
  * 2. Create an event handler for breedSelect that does the following:
@@ -67,6 +67,117 @@ const handleResponse = async (response) => {
  * - Each new selection should clear, re-populate, and restart the Carousel.
  * - Add a call to this function to the end of your initialLoad function above to create the initial carousel.
  */
+
+// async function retrieveData() {
+//   const value = breedSelect.value;
+//   try {
+//     const response = await fetch(
+//       `https://api.thecatapi.com/v1/images/search?limit=10&breed_ids=${value}&api_key=${API_KEY}`,
+//       {
+//         method: "GET",
+//         headers: {
+//           "Content-Type": "application/json",
+//         },
+//       },
+//     );
+//     handlelListOfImgs(response);
+//   } catch (err) {
+//     console.error(err);
+//   }
+// }
+
+// const handlelListOfImgs = async (response) => {
+//   if (response.ok) {
+//     Carousel.clear();
+//     const elements = await response.json();
+//     elements.forEach((elem) => {
+//       const child = Carousel.createCarouselItem(
+//         elem.url,
+//         elem.breeds.name,
+//         elem.id,
+//       );
+//       Carousel.appendCarousel(child);
+//     });
+//     Carousel.start();
+//     showInfo(elements[0].breeds[0]);
+//   } else {
+//     console.log(response.status);
+//   }
+// };
+
+// const showInfo = (breed) => {
+//   const table = infoDump.querySelector("table");
+//   const data = table.querySelectorAll("td");
+//   infoDump.style.display = "block";
+
+//   table.querySelector("caption").textContent = breed.name;
+
+//   data.forEach((d, index) => {
+//     switch (index) {
+//       case 0:
+//         d.textContent = breed.affection_level;
+//         break;
+//       case 1:
+//         d.textContent = breed.child_friendly;
+//         break;
+//       case 2:
+//         d.textContent = breed.dog_friendly;
+//         break;
+//       case 3:
+//         d.textContent = breed.hypoallergenic;
+//         break;
+//       case 4:
+//         d.textContent = breed.social_needs;
+//         break;
+//       case 5:
+//         d.textContent = breed.life_span;
+//         break;
+//       default:
+//         d.textContent = "";
+//         break;
+//     }
+//   });
+// };
+
+// breedSelect.addEventListener("change", retrieveData);
+
+/**
+ * 3. Fork your own sandbox, creating a new one named "JavaScript Axios Lab."
+ */
+/**
+ * 4. Change all of your fetch() functions to axios!
+ * - axios has already been imported for you within index.js.
+ * - If you've done everything correctly up to this point, this should be simple.
+ * - If it is not simple, take a moment to re-evaluate your original code.
+ * - Hint: Axios has the ability to set default headers. Use this to your advantage
+ *   by setting a default header with your API key so that you do not have to
+ *   send it manually with all of your requests! You can also set a default base URL!
+ */
+
+(async function initalLoad() {
+  try {
+    const response = await axios.get(
+      `https://api.thecatapi.com/v1/breeds?api_key=${API_KEY}`,
+    );
+    if (response.status !== 200) {
+      throw new Error(`${response.status}`);
+    }
+    handleResponse(response);
+  } catch (err) {
+    console.error(err);
+  }
+  //retrieveData();
+})();
+
+const handleResponse = async (response) => {
+  const breeds = response.data;
+  breeds.forEach((breed) => {
+    const option = document.createElement("option");
+    option.text = breed.name;
+    option.value = breed.id;
+    breedSelect.appendChild(option);
+  });
+};
 
 async function retrieveData() {
   const value = breedSelect.value;
@@ -84,26 +195,26 @@ async function retrieveData() {
   } catch (err) {
     console.error(err);
   }
-}
+// }
 
-const handlelListOfImgs = async (response) => {
-  if (response.ok) {
-    Carousel.clear();
-    const elements = await response.json();
-    elements.forEach((elem) => {
-      const child = Carousel.createCarouselItem(
-        elem.url,
-        elem.breeds.name,
-        elem.id,
-      );
-      Carousel.appendCarousel(child);
-    });
-    Carousel.start();
-    showInfo(elements[0].breeds[0]);
-  } else {
-    console.log(response.status);
-  }
-};
+// // const handlelListOfImgs = async (response) => {
+// //   if (response.ok) {
+// //     Carousel.clear();
+// //     const elements = await response.json();
+// //     elements.forEach((elem) => {
+// //       const child = Carousel.createCarouselItem(
+// //         elem.url,
+// //         elem.breeds.name,
+// //         elem.id,
+// //       );
+// //       Carousel.appendCarousel(child);
+// //     });
+// //     Carousel.start();
+// //     showInfo(elements[0].breeds[0]);
+// //   } else {
+// //     console.log(response.status);
+// //   }
+// // };
 
 const showInfo = (breed) => {
   const table = infoDump.querySelector("table");
@@ -138,21 +249,6 @@ const showInfo = (breed) => {
     }
   });
 };
-
-breedSelect.addEventListener("change", retrieveData);
-
-/**
- * 3. Fork your own sandbox, creating a new one named "JavaScript Axios Lab."
- */
-/**
- * 4. Change all of your fetch() functions to axios!
- * - axios has already been imported for you within index.js.
- * - If you've done everything correctly up to this point, this should be simple.
- * - If it is not simple, take a moment to re-evaluate your original code.
- * - Hint: Axios has the ability to set default headers. Use this to your advantage
- *   by setting a default header with your API key so that you do not have to
- *   send it manually with all of your requests! You can also set a default base URL!
- */
 /**
  * 5. Add axios interceptors to log the time between request and response to the console.
  * - Hint: you already have access to code that does this!
