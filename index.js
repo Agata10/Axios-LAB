@@ -195,10 +195,11 @@ async function retrieveData() {
     const elements = response.data;
     console.log(`Request took ${durationInMS}`);
 
+    console.log(elements);
+    handlelListOfImgs(elements);
     if (response.status !== 200) {
       throw new Error(response.status);
     }
-    handlelListOfImgs(elements);
   } catch (err) {
     console.error(err);
   }
@@ -261,7 +262,7 @@ breedSelect.addEventListener("change", retrieveData);
  */
 
 axios.interceptors.request.use((request) => {
-  // progressBar.style.width = "0%";
+  progressBar.style.width = "0%";
   request.metadata = request.metadata || {};
   request.metadata.startTime = new Date().getTime();
   return request;
@@ -272,7 +273,6 @@ axios.interceptors.response.use(
     response.config.metadata.endTime = new Date().getTime();
     response.durationInMS =
       response.config.metadata.endTime - response.config.metadata.startTime;
-    progressBar.style.width = "0%";
 
     return response;
   },
