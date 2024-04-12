@@ -219,7 +219,7 @@ const handlelListOfImgs = (elements) => {
     Carousel.appendCarousel(child);
   });
   Carousel.start();
-  //showInfo(elements[0].breeds[0]);
+  showInfo(elements[0].breeds[0]);
   selected = false;
 };
 
@@ -228,15 +228,15 @@ const showInfo = (breed) => {
   const data = table.querySelectorAll("td");
   infoDump.style.display = "block";
 
-  //table.querySelector("caption").textContent = breed.name;
+  table.querySelector("caption").textContent = breed.name;
 
   data.forEach((d, index) => {
     switch (index) {
       case 0:
-        d.textContent = ""; //breed.affection_level;
+        d.textContent = breed.affection_level;
         break;
       case 1:
-        d.textContent = ""; //breed.child_friendly;
+        d.textContent = breed.child_friendly;
         break;
       case 2:
         d.textContent = breed.dog_friendly;
@@ -309,7 +309,7 @@ function updateProgress(ProgressEvent) {
   const percentage = Math.round(ProgressEvent.progress * 100);
   setTimeout(() => {
     progressBar.style.width = `${percentage}%`;
-  }, 1000);
+  }, 800);
   progressBar.style.width = `${percentage}%`;
   progressBar.style.transition = "width ease 1s";
 }
