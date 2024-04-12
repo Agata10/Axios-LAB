@@ -14,6 +14,8 @@ const getFavouritesBtn = document.getElementById("getFavouritesBtn");
 // Step 0: Store your API key here for reference and easy access.
 const API_KEY =
   "live_VK9v9Y7A19F4Eqlo3fNyWAQ8iaY1dhKu3Lvg4ImOoygZPAp5oit1zOe7r4POvWc3";
+axios.defaults.baseURL = "https://api.thecatapi.com/v1";
+axios.defaults.headers.common["x-api-key"] = API_KEY;
 
 /**
  * 1. Create an async function "initialLoad" that does the following:
@@ -156,9 +158,7 @@ const API_KEY =
 
 (async function initalLoad() {
   try {
-    const response = await axios.get(
-      `https://api.thecatapi.com/v1/breeds?api_key=${API_KEY}`,
-    );
+    const response = await axios.get("/breeds");
     if (response.status !== 200) {
       throw new Error(`${response.status}`);
     }
@@ -166,11 +166,11 @@ const API_KEY =
   } catch (err) {
     console.error(err);
   }
-  //retrieveData();
+  retrieveData();
 })();
 
 const handleResponse = async (response) => {
-  const breeds = response.data;
+  const breeds = await response.data;
   breeds.forEach((breed) => {
     const option = document.createElement("option");
     option.text = breed.name;
@@ -182,39 +182,32 @@ const handleResponse = async (response) => {
 async function retrieveData() {
   const value = breedSelect.value;
   try {
-    const response = await fetch(
-      `https://api.thecatapi.com/v1/images/search?limit=10&breed_ids=${value}&api_key=${API_KEY}`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      },
+    const response = await axios.get(
+      `/images/search?limit=10&breed_ids=${value}`,
     );
-    handlelListOfImgs(response);
+    if (response.status !== 200) {
+      throw new Error(response.status);
+    }
+    handlelListOfImgs(response.data);
   } catch (err) {
     console.error(err);
   }
-// }
+}
 
-// // const handlelListOfImgs = async (response) => {
-// //   if (response.ok) {
-// //     Carousel.clear();
-// //     const elements = await response.json();
-// //     elements.forEach((elem) => {
-// //       const child = Carousel.createCarouselItem(
-// //         elem.url,
-// //         elem.breeds.name,
-// //         elem.id,
-// //       );
-// //       Carousel.appendCarousel(child);
-// //     });
-// //     Carousel.start();
-// //     showInfo(elements[0].breeds[0]);
-// //   } else {
-// //     console.log(response.status);
-// //   }
-// // };
+const handlelListOfImgs = async (response) => {
+  Carousel.clear();
+  const elements = response;
+  elements.forEach((elem) => {
+    const child = Carousel.createCarouselItem(
+      elem.url,
+      elem.breeds.name,
+      elem.id,
+    );
+    Carousel.appendCarousel(child);
+  });
+  Carousel.start();
+  showInfo(elements[0].breeds[0]);
+};
 
 const showInfo = (breed) => {
   const table = infoDump.querySelector("table");
