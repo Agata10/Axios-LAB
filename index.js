@@ -23,32 +23,33 @@ const API_KEY =
  * This function should execute immediately.
  */
 (async function initalLoad() {
-  try {
-    const response = await fetch(
-      `https://api.thecatapi.com/v1/breeds?api_key=${API_KEY}`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
+  const response = await fetch(
+    `https://api.thecatapi.com/v1/breeds?api_key=${API_KEY}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
       },
-    );
-    if (!response.ok) {
-      throw new Error("Not fetched data.");
-    }
+    },
+  );
+  handleResponse(response);
+})();
 
+const handleResponse = async (response) => {
+  if (response.ok) {
     const breeds = await response.json();
+
     breeds.forEach((breed) => {
-      console.log(breeds);
       const option = document.createElement("option");
       option.text = breed.name;
       option.value = breed.id;
       breedSelect.appendChild(option);
     });
-  } catch (err) {
-    console.error(err);
+  } else {
+    console.log(response.status);
   }
-})();
+};
+
 /**
  * 2. Create an event handler for breedSelect that does the following:
  * - Retrieve information on the selected breed from the cat API using fetch().
@@ -63,8 +64,8 @@ const API_KEY =
  * - Each new selection should clear, re-populate, and restart the Carousel.
  * - Add a call to this function to the end of your initialLoad function above to create the initial carousel.
  */
+
 async function retrieveData(e) {
-  let count = 0;
   try {
     const response = await fetch(
       `https://api.thecatapi.com/v1/images/search?limit=10&breed_ids=${e.target.value}&api_key=${API_KEY}`,
@@ -75,9 +76,15 @@ async function retrieveData(e) {
         },
       },
     );
-    console.log(count++);
-    const elements = await response.json();
+    handlelListOfImgs(response);
+  } catch (err) {
+    console.error(err);
+  }
+}
 
+const handlelListOfImgs = async (response) => {
+  if (response.ok) {
+    const elements = await response.json();
     elements.forEach((elem) => {
       const child = Carousel.createCarouselItem(
         elem.url,
@@ -85,13 +92,44 @@ async function retrieveData(e) {
         elem.id,
       );
       Carousel.appendCarousel(child);
-      // console.log(elem.breeds[0].dog_friendly);
-      // console.log(elem.breeds[0].affection_level);
     });
-  } catch (err) {
-    console.error(err);
+    showInfo(elements[0].breeds[0]);
+  } else {
+    console.log(response.status);
   }
-}
+};
+
+const showInfo = (breed) => {
+  const table = infoDump.querySelector("table");
+  const data = table.querySelectorAll("td");
+
+  data.forEach((d, index) => {
+    switch (index) {
+      case 0:
+        d.textContent = breed.affection_level;
+        break;
+      case 1:
+        d.textContent = breed.child_friendly;
+        break;
+      case 2:
+        d.textContent = breed.dog_friendly;
+        break;
+      case 3:
+        d.textContent = breed.hypoallergenic;
+        break;
+      case 4:
+        d.textContent = breed.social_needs;
+        break;
+      case 5:
+        d.textContent = breed.life_span;
+        break;
+      default:
+        d.textContent = "";
+        break;
+    }
+  });
+};
+
 breedSelect.addEventListener("change", retrieveData);
 
 /**
