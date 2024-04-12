@@ -10,7 +10,7 @@ infoDump.style.display = "none";
 const progressBar = document.getElementById("progressBar");
 // The get favourites button element.
 const getFavouritesBtn = document.getElementById("getFavouritesBtn");
-
+let selected = false;
 // Step 0: Store your API key here for reference and easy access.
 const API_KEY =
   "live_VK9v9Y7A19F4Eqlo3fNyWAQ8iaY1dhKu3Lvg4ImOoygZPAp5oit1zOe7r4POvWc3";
@@ -156,21 +156,43 @@ axios.defaults.headers.common["x-api-key"] = API_KEY;
  *   send it manually with all of your requests! You can also set a default base URL!
  */
 
+axios.interceptors.request.use((request) => {
+  request.metadata = request.metadata || {};
+  request.metadata.startTime = new Date().getTime();
+  return request;
+});
+
+axios.interceptors.response.use(
+  (response) => {
+    response.config.metadata.endTime = new Date().getTime();
+    response.durationInMS =
+      response.config.metadata.endTime - response.config.metadata.startTime;
+    return response;
+  },
+  (error) => {
+    error.config.metadata.endTime = new Date().getTime();
+    error.durationInMS =
+      error.config.metadata.endTime - error.config.metadata.startTime;
+    throw error;
+  },
+);
+
 (async function initalLoad() {
   try {
     const response = await axios.get("/breeds");
+    const breeds = response.data;
     if (response.status !== 200) {
-      throw new Error(`${response.status}`);
+      throw new Error(`HTTP error! Status: ${response.status}`);
     }
-    handleResponse(response);
+
+    handleResponse(breeds);
   } catch (err) {
     console.error(err);
   }
   retrieveData();
 })();
 
-const handleResponse = async (response) => {
-  const breeds = await response.data;
+const handleResponse = async (breeds) => {
   breeds.forEach((breed) => {
     const option = document.createElement("option");
     option.text = breed.name;
@@ -185,18 +207,40 @@ async function retrieveData() {
     const response = await axios.get(
       `/images/search?limit=10&breed_ids=${value}`,
     );
+
+    const { data, durationInMS } = await axios(
+      `/images/search?limit=10&breed_ids=${value}`,
+    );
+    console.log(`Request took ${durationInMS}`);
+    console.log(`Data ${data}`);
     if (response.status !== 200) {
       throw new Error(response.status);
     }
-    handlelListOfImgs(response.data);
+    selected = true;
+
+    if (selected) {
+      const elements = response.data;
+      Carousel.clear();
+      elements.forEach((elem) => {
+        const child = Carousel.createCarouselItem(
+          elem.url,
+          elem.breeds.name,
+          elem.id,
+        );
+        Carousel.appendCarousel(child);
+      });
+      Carousel.start();
+      //showInfo(elements[0].breeds[0]);
+      selected = false;
+    }
   } catch (err) {
     console.error(err);
   }
 }
 
-const handlelListOfImgs = async (response) => {
+const handlelListOfImgs = (response) => {
+  const elements = response.data;
   Carousel.clear();
-  const elements = response;
   elements.forEach((elem) => {
     const child = Carousel.createCarouselItem(
       elem.url,
@@ -206,7 +250,8 @@ const handlelListOfImgs = async (response) => {
     Carousel.appendCarousel(child);
   });
   Carousel.start();
-  showInfo(elements[0].breeds[0]);
+  //showInfo(elements[0].breeds[0]);
+  selected = false;
 };
 
 const showInfo = (breed) => {
@@ -214,15 +259,15 @@ const showInfo = (breed) => {
   const data = table.querySelectorAll("td");
   infoDump.style.display = "block";
 
-  table.querySelector("caption").textContent = breed.name;
+  //table.querySelector("caption").textContent = breed.name;
 
   data.forEach((d, index) => {
     switch (index) {
       case 0:
-        d.textContent = breed.affection_level;
+        d.textContent = ""; //breed.affection_level;
         break;
       case 1:
-        d.textContent = breed.child_friendly;
+        d.textContent = ""; //breed.child_friendly;
         break;
       case 2:
         d.textContent = breed.dog_friendly;
@@ -242,6 +287,8 @@ const showInfo = (breed) => {
     }
   });
 };
+
+breedSelect.addEventListener("change", retrieveData);
 /**
  * 5. Add axios interceptors to log the time between request and response to the console.
  * - Hint: you already have access to code that does this!
