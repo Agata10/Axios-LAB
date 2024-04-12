@@ -6,7 +6,6 @@ const breedSelect = document.getElementById("breedSelect");
 // The information section div element.
 const infoDump = document.getElementById("infoDump");
 infoDump.style.display = "none";
-let selected = false;
 // The progress bar div element.
 const progressBar = document.getElementById("progressBar");
 // The get favourites button element.
@@ -81,7 +80,6 @@ async function retrieveData() {
         },
       },
     );
-    selected = true;
     handlelListOfImgs(response);
   } catch (err) {
     console.error(err);
@@ -89,7 +87,7 @@ async function retrieveData() {
 }
 
 const handlelListOfImgs = async (response) => {
-  if (response.ok && selected) {
+  if (response.ok) {
     Carousel.clear();
     const elements = await response.json();
     elements.forEach((elem) => {
@@ -102,7 +100,6 @@ const handlelListOfImgs = async (response) => {
     });
     Carousel.start();
     showInfo(elements[0].breeds[0]);
-    selected = false;
   } else {
     console.log(response.status);
   }
