@@ -6,6 +6,7 @@ const breedSelect = document.getElementById("breedSelect");
 // The information section div element.
 const infoDump = document.getElementById("infoDump");
 infoDump.style.display = "none";
+let selected = false;
 // The progress bar div element.
 const progressBar = document.getElementById("progressBar");
 // The get favourites button element.
@@ -34,6 +35,7 @@ const API_KEY =
     },
   );
   handleResponse(response);
+  retrieveData();
 })();
 
 const handleResponse = async (response) => {
@@ -67,10 +69,11 @@ const handleResponse = async (response) => {
  * - Add a call to this function to the end of your initialLoad function above to create the initial carousel.
  */
 
-async function retrieveData(e) {
+async function retrieveData() {
+  const value = breedSelect.value;
   try {
     const response = await fetch(
-      `https://api.thecatapi.com/v1/images/search?limit=10&breed_ids=${e.target.value}&api_key=${API_KEY}`,
+      `https://api.thecatapi.com/v1/images/search?limit=10&breed_ids=${value}&api_key=${API_KEY}`,
       {
         method: "GET",
         headers: {
@@ -78,6 +81,7 @@ async function retrieveData(e) {
         },
       },
     );
+    selected = true;
     handlelListOfImgs(response);
   } catch (err) {
     console.error(err);
@@ -85,7 +89,8 @@ async function retrieveData(e) {
 }
 
 const handlelListOfImgs = async (response) => {
-  if (response.ok) {
+  if (response.ok && selected) {
+    Carousel.clear();
     const elements = await response.json();
     elements.forEach((elem) => {
       const child = Carousel.createCarouselItem(
@@ -95,7 +100,9 @@ const handlelListOfImgs = async (response) => {
       );
       Carousel.appendCarousel(child);
     });
+    Carousel.start();
     showInfo(elements[0].breeds[0]);
+    selected = false;
   } else {
     console.log(response.status);
   }
