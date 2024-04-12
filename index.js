@@ -310,7 +310,6 @@ function updateProgress(ProgressEvent) {
   setTimeout(() => {
     progressBar.style.width = `${percentage}%`;
   }, 800);
-  progressBar.style.width = `${percentage}%`;
   progressBar.style.transition = "width ease 1s";
 }
 
