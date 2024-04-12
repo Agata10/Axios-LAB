@@ -35,11 +35,11 @@ export function appendCarousel(element) {
 
 export function start() {
   const multipleCardCarousel = document.querySelector(
-    "#carouselExampleControls"
+    "#carouselExampleControls",
   );
   if (window.matchMedia("(min-width: 768px)").matches) {
     const carousel = new bootstrap.Carousel(multipleCardCarousel, {
-      interval: false
+      interval: false,
     });
     const carouselWidth = $(".carousel-inner")[0].scrollWidth;
     const cardWidth = $(".carousel-item").width();
@@ -52,10 +52,10 @@ export function start() {
           scrollPosition += cardWidth;
           $("#carouselExampleControls .carousel-inner").animate(
             { scrollLeft: scrollPosition },
-            600
+            600,
           );
         }
-      }
+      },
     );
     $("#carouselExampleControls .carousel-control-prev").unbind();
     $("#carouselExampleControls .carousel-control-prev").on(
@@ -65,10 +65,10 @@ export function start() {
           scrollPosition -= cardWidth;
           $("#carouselExampleControls .carousel-inner").animate(
             { scrollLeft: scrollPosition },
-            600
+            600,
           );
         }
-      }
+      },
     );
   } else {
     $(multipleCardCarousel).addClass("slide");
