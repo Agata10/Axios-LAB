@@ -5,7 +5,7 @@ import axios from "axios";
 const breedSelect = document.getElementById("breedSelect");
 // The information section div element.
 const infoDump = document.getElementById("infoDump");
-//infoDump.style.display = "none";
+infoDump.style.display = "none";
 // The progress bar div element.
 const progressBar = document.getElementById("progressBar");
 // The get favourites button element.
@@ -48,6 +48,7 @@ const handleResponse = async (response) => {
     });
   } else {
     console.log(response.status);
+    return response.status;
   }
 };
 
@@ -104,6 +105,8 @@ const showInfo = (breed) => {
   const table = infoDump.querySelector("table");
   const data = table.querySelectorAll("td");
   infoDump.style.display = "block";
+
+  table.querySelector("caption").textContent = breed.name;
 
   data.forEach((d, index) => {
     switch (index) {
