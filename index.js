@@ -156,27 +156,6 @@ axios.defaults.headers.common["x-api-key"] = API_KEY;
  *   send it manually with all of your requests! You can also set a default base URL!
  */
 
-axios.interceptors.request.use((request) => {
-  request.metadata = request.metadata || {};
-  request.metadata.startTime = new Date().getTime();
-  return request;
-});
-
-axios.interceptors.response.use(
-  (response) => {
-    response.config.metadata.endTime = new Date().getTime();
-    response.durationInMS =
-      response.config.metadata.endTime - response.config.metadata.startTime;
-    return response;
-  },
-  (error) => {
-    error.config.metadata.endTime = new Date().getTime();
-    error.durationInMS =
-      error.config.metadata.endTime - error.config.metadata.startTime;
-    throw error;
-  },
-);
-
 (async function initalLoad() {
   try {
     const response = await axios.get("/breeds");
@@ -192,7 +171,7 @@ axios.interceptors.response.use(
   retrieveData();
 })();
 
-const handleResponse = async (breeds) => {
+const handleResponse = (breeds) => {
   breeds.forEach((breed) => {
     const option = document.createElement("option");
     option.text = breed.name;
@@ -206,40 +185,30 @@ async function retrieveData() {
   try {
     const response = await axios.get(
       `/images/search?limit=10&breed_ids=${value}`,
+      {
+        onDownloadProgress: updateProgress,
+      },
     );
 
     const { data, durationInMS } = await axios(
       `/images/search?limit=10&breed_ids=${value}`,
     );
+    const elements = response.data;
+    selected = true;
     console.log(`Request took ${durationInMS}`);
-    console.log(`Data ${data}`);
+
     if (response.status !== 200) {
       throw new Error(response.status);
     }
-    selected = true;
-
     if (selected) {
-      const elements = response.data;
-      Carousel.clear();
-      elements.forEach((elem) => {
-        const child = Carousel.createCarouselItem(
-          elem.url,
-          elem.breeds.name,
-          elem.id,
-        );
-        Carousel.appendCarousel(child);
-      });
-      Carousel.start();
-      //showInfo(elements[0].breeds[0]);
-      selected = false;
+      handlelListOfImgs(elements);
     }
   } catch (err) {
     console.error(err);
   }
 }
 
-const handlelListOfImgs = (response) => {
-  const elements = response.data;
+const handlelListOfImgs = (elements) => {
   Carousel.clear();
   elements.forEach((elem) => {
     const child = Carousel.createCarouselItem(
@@ -296,6 +265,29 @@ breedSelect.addEventListener("change", retrieveData);
  * - As an added challenge, try to do this on your own without referencing the lesson material.
  */
 
+axios.interceptors.request.use((request) => {
+  // progressBar.style.width = "0%";
+  request.metadata = request.metadata || {};
+  request.metadata.startTime = new Date().getTime();
+  return request;
+});
+
+axios.interceptors.response.use(
+  (response) => {
+    response.config.metadata.endTime = new Date().getTime();
+    response.durationInMS =
+      response.config.metadata.endTime - response.config.metadata.startTime;
+    progressBar.style.width = "0%";
+
+    return response;
+  },
+  (error) => {
+    error.config.metadata.endTime = new Date().getTime();
+    error.durationInMS =
+      error.config.metadata.endTime - error.config.metadata.startTime;
+    throw error;
+  },
+);
 /**
  * 6. Next, we'll create a progress bar to indicate the request is in progress.
  * - The progressBar element has already been created for you.
@@ -311,6 +303,16 @@ breedSelect.addEventListener("change", retrieveData);
  *   once or twice per request to this API. This is still a concept worth familiarizing yourself
  *   with for future projects.
  */
+
+function updateProgress(ProgressEvent) {
+  console.log(ProgressEvent.progress);
+  const percentage = Math.round(ProgressEvent.progress * 100);
+  setTimeout(() => {
+    progressBar.style.width = `${percentage}%`;
+  }, 1000);
+  progressBar.style.width = `${percentage}%`;
+  progressBar.style.transition = "width ease 1s";
+}
 
 /**
  * 7. As a final element of progress indication, add the following to your axios interceptors:
