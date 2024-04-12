@@ -10,7 +10,6 @@ infoDump.style.display = "none";
 const progressBar = document.getElementById("progressBar");
 // The get favourites button element.
 const getFavouritesBtn = document.getElementById("getFavouritesBtn");
-let selected = false;
 // Step 0: Store your API key here for reference and easy access.
 const API_KEY =
   "live_VK9v9Y7A19F4Eqlo3fNyWAQ8iaY1dhKu3Lvg4ImOoygZPAp5oit1zOe7r4POvWc3";
@@ -194,15 +193,12 @@ async function retrieveData() {
       `/images/search?limit=10&breed_ids=${value}`,
     );
     const elements = response.data;
-    selected = true;
     console.log(`Request took ${durationInMS}`);
 
     if (response.status !== 200) {
       throw new Error(response.status);
     }
-    if (selected) {
-      handlelListOfImgs(elements);
-    }
+    handlelListOfImgs(elements);
   } catch (err) {
     console.error(err);
   }
@@ -220,7 +216,6 @@ const handlelListOfImgs = (elements) => {
   });
   Carousel.start();
   showInfo(elements[0].breeds[0]);
-  selected = false;
 };
 
 const showInfo = (breed) => {
