@@ -5,6 +5,7 @@ import axios from "axios";
 const breedSelect = document.getElementById("breedSelect");
 // The information section div element.
 const infoDump = document.getElementById("infoDump");
+//infoDump.style.display = "none";
 // The progress bar div element.
 const progressBar = document.getElementById("progressBar");
 // The get favourites button element.
@@ -102,6 +103,7 @@ const handlelListOfImgs = async (response) => {
 const showInfo = (breed) => {
   const table = infoDump.querySelector("table");
   const data = table.querySelectorAll("td");
+  infoDump.style.display = "block";
 
   data.forEach((d, index) => {
     switch (index) {

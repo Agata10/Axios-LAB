@@ -53,6 +53,16 @@ body {
   top: 50%;
   transform: translateY(-50%);
 }
+
+#info-Dump table {
+  border-collapse: collapse;
+}
+#info-Dump table,
+th,
+td {
+  border: 1px solid green;
+}
+
 @media (min-width: 768px) {
   .carousel-item {
     margin-right: 0;
