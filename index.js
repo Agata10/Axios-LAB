@@ -64,6 +64,7 @@ const handleResponse = async (response) => {
  * - Each new selection should clear, re-populate, and restart the Carousel.
  * - Add a call to this function to the end of your initialLoad function above to create the initial carousel.
  */
+
 async function retrieveData(e) {
   try {
     const response = await fetch(
