@@ -209,7 +209,7 @@ const handleAppendingCarousel = (elements) => {
   elements.forEach((elem) => {
     const child = Carousel.createCarouselItem(
       elem.url,
-      elem.breeds.name,
+      breedSelect.value,
       elem.id,
     );
     Carousel.appendCarousel(child);
@@ -329,8 +329,18 @@ function updateProgress(ProgressEvent) {
  * - You can call this function by clicking on the heart at the top right of any image.
  */
 export async function favourite(imgId) {
-  let requestBody = { image_id: imgId, sub_id: "user-Agata" };
-  const newFavourite = axios.post("/favourites");
+  let requestBody = { image_id: imgId };
+  const isExisting = await axios.get(`/favourites?image_id=${imgId}`);
+  console.log(isExisting);
+
+  if (isExisting.data[0]) {
+    //console.log(isExisting.data[0]);
+    await axios.delete(`/favourites/${isExisting.data[0].id}`);
+    console.log("Delete img with id");
+  } else {
+    await axios.post("/favourites", requestBody);
+    console.log("Added img");
+  }
 }
 
 /**
@@ -342,7 +352,22 @@ export async function favourite(imgId) {
  *    If that isn't in its own function, maybe it should be so you don't have to
  *    repeat yourself in this section.
  */
+async function getFavourites() {
+  const getFav = await axios.get(`/favourites`);
+  const elements = getFav.data;
+  Carousel.clear();
+  elements.forEach((elem) => {
+    const child = Carousel.createCarouselItem(
+      elem.image.url,
+      breedSelect.value,
+      elem.image.id,
+    );
+    Carousel.appendCarousel(child);
+  });
+  Carousel.start();
+}
 
+getFavouritesBtn.addEventListener("click", getFavourites);
 /**
  * 10. Test your site, thoroughly!
  * - What happens when you try to load the Malayan breed?
