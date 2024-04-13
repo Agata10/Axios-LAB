@@ -10,6 +10,7 @@ infoDump.style.display = "none";
 const progressBar = document.getElementById("progressBar");
 // The get favourites button element.
 const getFavouritesBtn = document.getElementById("getFavouritesBtn");
+document.getElementById("fav-p").style.display = "none";
 // Step 0: Store your API key here for reference and easy access.
 const API_KEY =
   "live_VK9v9Y7A19F4Eqlo3fNyWAQ8iaY1dhKu3Lvg4ImOoygZPAp5oit1zOe7r4POvWc3";
@@ -188,23 +189,27 @@ async function retrieveData() {
         onDownloadProgress: updateProgress,
       },
     );
+    console.log(response);
+
+    if (!response.data[0]) {
+      infoDump.innerHTML = "No data about this cat.";
+      Carousel.clear();
+      throw new Error("No data provided.");
+    }
 
     // const { data, durationInMS } = await axios(
     //   `/images/search?limit=10&breed_ids=${value}`,
     // );
     const elements = response.data;
-
-    //console.log(elements);
+    console.log(elements);
     handleAppendingCarousel(elements);
-    if (response.status !== 200) {
-      throw new Error(response.status);
-    }
   } catch (err) {
     console.error(err);
   }
 }
 
 const handleAppendingCarousel = (elements) => {
+  document.getElementById("fav-p").style.display = "none";
   Carousel.clear();
   elements.forEach((elem) => {
     const child = Carousel.createCarouselItem(
@@ -222,7 +227,6 @@ const showInfo = (breed) => {
   const table = infoDump.querySelector("table");
   const data = table.querySelectorAll("td");
   infoDump.style.display = "block";
-
   table.querySelector("caption").textContent = breed.name;
 
   data.forEach((d, index) => {
@@ -365,6 +369,8 @@ async function getFavourites() {
     Carousel.appendCarousel(child);
   });
   Carousel.start();
+  document.getElementById("fav-p").style.display = "block";
+  infoDump.style.display = "none";
 }
 
 getFavouritesBtn.addEventListener("click", getFavourites);
