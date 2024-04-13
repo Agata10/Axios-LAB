@@ -189,14 +189,13 @@ async function retrieveData() {
       },
     );
 
-    const { data, durationInMS } = await axios(
-      `/images/search?limit=10&breed_ids=${value}`,
-    );
+    // const { data, durationInMS } = await axios(
+    //   `/images/search?limit=10&breed_ids=${value}`,
+    // );
     const elements = response.data;
-    console.log(`Request took ${durationInMS}`);
 
-    console.log(elements);
-    handlelListOfImgs(elements);
+    //console.log(elements);
+    handleAppendingCarousel(elements);
     if (response.status !== 200) {
       throw new Error(response.status);
     }
@@ -205,7 +204,7 @@ async function retrieveData() {
   }
 }
 
-const handlelListOfImgs = (elements) => {
+const handleAppendingCarousel = (elements) => {
   Carousel.clear();
   elements.forEach((elem) => {
     const child = Carousel.createCarouselItem(
@@ -262,7 +261,9 @@ breedSelect.addEventListener("change", retrieveData);
  */
 
 axios.interceptors.request.use((request) => {
+  document.body.style.cursor = "progress";
   progressBar.style.width = "0%";
+  //console.log("Request started");
   request.metadata = request.metadata || {};
   request.metadata.startTime = new Date().getTime();
   return request;
@@ -270,16 +271,19 @@ axios.interceptors.request.use((request) => {
 
 axios.interceptors.response.use(
   (response) => {
+    //console.log("Request ended");
+    document.body.style.cursor = "default";
     response.config.metadata.endTime = new Date().getTime();
     response.durationInMS =
       response.config.metadata.endTime - response.config.metadata.startTime;
-
+    console.log(`Request took ${response.durationInMS}`);
     return response;
   },
   (error) => {
     error.config.metadata.endTime = new Date().getTime();
     error.durationInMS =
       error.config.metadata.endTime - error.config.metadata.startTime;
+    console.log(`Request took ${response.durationInMS}`);
     throw error;
   },
 );
@@ -300,7 +304,7 @@ axios.interceptors.response.use(
  */
 
 function updateProgress(ProgressEvent) {
-  console.log(ProgressEvent.progress);
+  //console.log(ProgressEvent.progress);
   const percentage = Math.round(ProgressEvent.progress * 100);
   setTimeout(() => {
     progressBar.style.width = `${percentage}%`;
@@ -325,7 +329,8 @@ function updateProgress(ProgressEvent) {
  * - You can call this function by clicking on the heart at the top right of any image.
  */
 export async function favourite(imgId) {
-  // your code here
+  let requestBody = { image_id: imgId, sub_id: "user-Agata" };
+  const newFavourite = axios.post("/favourites");
 }
 
 /**
