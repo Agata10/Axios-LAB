@@ -189,20 +189,21 @@ async function retrieveData() {
         onDownloadProgress: updateProgress,
       },
     );
-    console.log(response);
 
     if (!response.data[0]) {
-      infoDump.innerHTML = "No data about this cat.";
+      infoDump.style.display = "none";
+      document.getElementById("fav-p").style.display = "block";
+      document.getElementById("fav-p").textContent = "Not data provided";
       Carousel.clear();
       throw new Error("No data provided.");
+    } else {
+      const elements = response.data;
+      handleAppendingCarousel(elements);
     }
 
     // const { data, durationInMS } = await axios(
     //   `/images/search?limit=10&breed_ids=${value}`,
     // );
-    const elements = response.data;
-    console.log(elements);
-    handleAppendingCarousel(elements);
   } catch (err) {
     console.error(err);
   }
@@ -228,7 +229,6 @@ const showInfo = (breed) => {
   const data = table.querySelectorAll("td");
   infoDump.style.display = "block";
   table.querySelector("caption").textContent = breed.name;
-
   data.forEach((d, index) => {
     switch (index) {
       case 0:
@@ -370,6 +370,7 @@ async function getFavourites() {
   });
   Carousel.start();
   document.getElementById("fav-p").style.display = "block";
+  document.getElementById("fav-p").textContent = "Your saved favourites";
   infoDump.style.display = "none";
 }
 
